@@ -129,18 +129,33 @@ function getFallbackBooks(query = '', maxResults = 20) {
     const getGoogleCover = (id) => `https://books.google.com/books/content?id=${id}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
 
     const fallbacks = [
-        { id: 'hlb_sM1AN0gC', title: 'The Hunger Games', author: 'Suzanne Collins', description: 'A televised fight to the death.', coverUrl: getGoogleCover('hlb_sM1AN0gC'), rating: 4.3, publishedDate: '2008', pages: 374, genre: ['Fiction', 'YA'] },
-        { id: 'icKmd-tlvPMC', title: 'Journey to the Center of the Earth', author: 'Jules Verne', description: 'An expedition to the core.', coverUrl: getGoogleCover('icKmd-tlvPMC'), rating: 4.5, publishedDate: '1864', pages: 240, genre: ['Fiction', 'Classic'] },
-        { id: 'A-AS46wG0p8C', title: 'The Da Vinci Code', author: 'Dan Brown', description: 'A religious conspiracy.', coverUrl: getGoogleCover('A-AS46wG0p8C'), rating: 4.5, publishedDate: '2003', pages: 454, genre: ['Thriller', 'Mystery'] },
-        { id: 'kPmLDQAAQBAJ', title: 'The Martian', author: 'Andy Weir', description: 'Stranded on Mars.', coverUrl: getGoogleCover('kPmLDQAAQBAJ'), rating: 4.7, publishedDate: '2011', pages: 369, genre: ['Sci-Fi', 'Adventure'] },
-        { id: 'GZAoAQAAIAAJ', title: 'Harry Potter and the Deathly Hallows', author: 'J.K. Rowling', description: 'The final battle.', coverUrl: getGoogleCover('GZAoAQAAIAAJ'), rating: 4.9, publishedDate: '2007', pages: 759, genre: ['Fantasy', 'YA'] },
-        { id: 'SxPUCwAAQBAJ', title: 'Me Before You', author: 'Jojo Moyes', description: 'A love story.', coverUrl: getGoogleCover('SxPUCwAAQBAJ'), rating: 4.5, publishedDate: '2012', pages: 369, genre: ['Romance'] },
-        { id: 'd2WZDgAAQBAJ', title: 'Einstein: His Life and Universe', author: 'Walter Isaacson', description: 'Life of the physicist.', coverUrl: getGoogleCover('d2WZDgAAQBAJ'), rating: 4.8, publishedDate: '2007', pages: 715, genre: ['Biography'] },
-        { id: 'O1MInVXd_aoC', title: 'The Power of Habit', author: 'Charles Duhigg', description: 'Why we do what we do.', coverUrl: getGoogleCover('O1MInVXd_aoC'), rating: 4.6, publishedDate: '2012', pages: 371, genre: ['Self-Help'] },
-        { id: '6WGhDwAAQBAJ', title: 'Think and Grow Rich', author: 'Napoleon Hill', description: 'Success principles.', coverUrl: getGoogleCover('6WGhDwAAQBAJ'), rating: 4.7, publishedDate: '1937', pages: 384, genre: ['Self-Help'] },
-        { id: 'EvqJCGeqKhsC', title: 'Pride and Prejudice', author: 'Jane Austen', description: 'Classic romance.', coverUrl: getGoogleCover('EvqJCGeqKhsC'), rating: 4.7, publishedDate: '1813', pages: 432, genre: ['Fiction', 'Classic'] },
-        { id: 'P9cHEAAAQBAJ', title: 'The Silent Patient', author: 'Alex Michaelides', description: 'A woman\'s act of violence against her husband.', coverUrl: getGoogleCover('P9cHEAAAQBAJ'), rating: 4.7, publishedDate: '2019', pages: 336, genre: ['Thriller', 'Mystery'] },
-        { id: 'S0_XAwAAQBAJ', title: 'Project Hail Mary', author: 'Andy Weir', description: 'Lone astronaut mission.', coverUrl: getGoogleCover('S0_XAwAAQBAJ'), rating: 4.9, publishedDate: '2021', pages: 496, genre: ['Sci-Fi'] },
+        // Fiction
+        { id: 'V79aAAAAIAAJ', title: 'To Kill a Mockingbird', author: 'Harper Lee', description: 'Racial injustice in the South.', coverUrl: getGoogleCover('V79aAAAAIAAJ'), rating: 4.8, publishedDate: '1960', pages: 281, genre: ['Fiction', 'Classic'] },
+        { id: '55A8AAAAIAAJ', title: '1984', author: 'George Orwell', description: 'Dystopian future.', coverUrl: getGoogleCover('55A8AAAAIAAJ'), rating: 4.7, publishedDate: '1949', pages: 328, genre: ['Fiction', 'Classic'] },
+        { id: 'i5L_tAEACAAJ', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', description: 'American dream.', coverUrl: getGoogleCover('i5L_tAEACAAJ'), rating: 4.5, publishedDate: '1925', pages: 180, genre: ['Fiction', 'Classic'] },
+        { id: 'f44mAwAAQBAJ', title: 'Harry Potter', author: 'J.K. Rowling', description: 'The boy who lived.', coverUrl: getGoogleCover('f44mAwAAQBAJ'), rating: 4.9, publishedDate: '1997', pages: 309, genre: ['Fiction', 'Fantasy'] },
+        { id: '_6R-DwAAQBAJ', title: 'The Hobbit', author: 'J.R.R. Tolkien', description: 'Unexpected journey.', coverUrl: getGoogleCover('_6R-DwAAQBAJ'), rating: 4.8, publishedDate: '1937', pages: 310, genre: ['Fiction', 'Fantasy'] },
+        // Mystery
+        { id: '7q26ngEACAAJ', title: 'Gone Girl', author: 'Gillian Flynn', description: 'Marriage mystery.', coverUrl: getGoogleCover('7q26ngEACAAJ'), rating: 4.5, publishedDate: '2012', pages: 415, genre: ['Mystery', 'Thriller'] },
+        { id: 's654DwAAQBAJ', title: 'The Silent Patient', author: 'Alex Michaelides', description: 'A woman\'s violence.', coverUrl: getGoogleCover('s654DwAAQBAJ'), rating: 4.7, publishedDate: '2019', pages: 336, genre: ['Thriller', 'Mystery'] },
+        { id: 'lZ15DwAAQBAJ', title: 'And Then There Were None', author: 'Agatha Christie', description: 'Ten strangers on an island.', coverUrl: getGoogleCover('lZ15DwAAQBAJ'), rating: 4.8, publishedDate: '1939', pages: 272, genre: ['Mystery', 'Classic'] },
+        // Sci-Fi
+        { id: '5_q1DwAAQBAJ', title: 'Dune', author: 'Frank Herbert', description: 'Epic sci-fi saga.', coverUrl: getGoogleCover('5_q1DwAAQBAJ'), rating: 4.7, publishedDate: '1965', pages: 412, genre: ['Sci-Fi', 'Classic'] },
+        { id: '8uS2AwAAQBAJ', title: 'Hitchhiker\'s Guide', author: 'Douglas Adams', description: 'Don\'t panic.', coverUrl: getGoogleCover('8uS2AwAAQBAJ'), rating: 4.8, publishedDate: '1979', pages: 215, genre: ['Sci-Fi', 'Comedy'] },
+        { id: 'U7_F5o20X5UC', title: 'Ender\'s Game', author: 'Orson Scott Card', description: 'Space war training.', coverUrl: getGoogleCover('U7_F5o20X5UC'), rating: 4.6, publishedDate: '1985', pages: 324, genre: ['Sci-Fi', 'Classic'] },
+        // Fantasy
+        { id: 'aX4XAgAAQBAJ', title: 'Game of Thrones', author: 'George R.R. Martin', description: 'Winter is coming.', coverUrl: getGoogleCover('aX4XAgAAQBAJ'), rating: 4.7, publishedDate: '1996', pages: 694, genre: ['Fantasy', 'Epic'] },
+        { id: '6S42AQAAQBAJ', title: 'The Name of the Wind', author: 'Patrick Rothfuss', description: 'Story of Kvothe.', coverUrl: getGoogleCover('6S42AQAAQBAJ'), rating: 4.6, publishedDate: '2007', pages: 662, genre: ['Fantasy', 'Epic'] },
+        // Romance
+        { id: 'Qe6zDwAAQBAJ', title: 'It Ends with Us', author: 'Colleen Hoover', description: 'Lily\'s life.', coverUrl: getGoogleCover('Qe6zDwAAQBAJ'), rating: 4.5, publishedDate: '2016', pages: 376, genre: ['Romance', 'Contemporary'] },
+        { id: 'EwIxEAAAQBAJ', title: 'The Love Hypothesis', author: 'Ali Hazelwood', description: 'Fake relationship.', coverUrl: getGoogleCover('EwIxEAAAQBAJ'), rating: 4.4, publishedDate: '2021', pages: 384, genre: ['Romance', 'Contemporary'] },
+        // History
+        { id: '68iICgAAQBAJ', title: 'Sapiens', author: 'Yuval Noah Harari', description: 'History of humankind.', coverUrl: getGoogleCover('68iICgAAQBAJ'), rating: 4.6, publishedDate: '2011', pages: 443, genre: ['History', 'Science'] },
+        // Biography
+        { id: '9_TCEAAAQBAJ', title: 'Elon Musk', author: 'Walter Isaacson', description: 'Tech mogul life.', coverUrl: getGoogleCover('9_TCEAAAQBAJ'), rating: 4.8, publishedDate: '2023', pages: 688, genre: ['Biography', 'Tech'] },
+        // Self-Help
+        { id: 'vS68DwAAQBAJ', title: 'Atomic Habits', author: 'James Clear', description: 'Build good habits.', coverUrl: getGoogleCover('vS68DwAAQBAJ'), rating: 4.8, publishedDate: '2018', pages: 320, genre: ['Self-Help', 'Psychology'] },
+        { id: 'idYfK-W-oAAC', title: 'Subtle Art', author: 'Mark Manson', description: 'Good life approach.', coverUrl: getGoogleCover('idYfK-W-oAAC'), rating: 4.2, publishedDate: '2016', pages: 224, genre: ['Self-Help', 'Psychology'] },
     ];
 
     const lowerQ = query.toLowerCase();
