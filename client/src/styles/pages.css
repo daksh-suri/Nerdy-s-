@@ -1279,11 +1279,11 @@
    Showcase Book Strip
    ========================================== */
 .lb-showcase {
-    background: #111;
+    background: transparent;
     padding: 2rem 0;
     overflow: hidden;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid rgba(139, 115, 85, 0.4);
+    border-bottom: 1px solid rgba(139, 115, 85, 0.4);
     margin-left: calc(-1 * var(--spacing-4));
     margin-right: calc(-1 * var(--spacing-4));
 }
@@ -1573,23 +1573,27 @@
 
 .genre-row-item {
     flex-shrink: 0;
-    width: 120px;
+    width: 110px;
+    /* Slightly narrower to fit ~10 on 1280px+ */
     scroll-snap-align: start;
     position: relative;
+    padding-top: 1rem;
 }
 
 .genre-rank {
     position: absolute;
-    top: -0.5rem;
-    left: -0.4rem;
-    font-size: 1.8rem;
+    top: -0.2rem;
+    left: -0.2rem;
+    font-size: 2.2rem;
     font-weight: 900;
     line-height: 1;
-    color: rgba(255, 255, 255, 0.08);
-    z-index: 1;
+    color: var(--primary);
+    opacity: 0.15;
+    z-index: 0;
     pointer-events: none;
     user-select: none;
     font-style: italic;
+    font-family: 'Outfit', sans-serif;
 }
 
 /* Skeleton loading state */
@@ -3658,3 +3662,6 @@
     height: 0.9rem;
     flex-shrink: 0;
 }
+/* Hide Scrollbars globally for horizontal scroll containers */
+.lb-showcase-inner, .genre-row-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.lb-showcase-inner::-webkit-scrollbar, .genre-row-scroll::-webkit-scrollbar { display: none; }

@@ -162,18 +162,21 @@ export function Home() {
     }, []);
 
     return (
-        <div className="home-wrapper">
-            {/* ── FULL-BLEED HERO ───────────────────────────────── */}
-            <section className="lb-hero" style={{ position: 'relative', overflow: 'hidden', backgroundColor: 'var(--background)' }}>
-                {/* Background Image Element */}
-                <div className="lb-hero-bg hero-gradient-bg" style={{ opacity: 0.95, mixBlendMode: 'normal', backgroundImage: 'url("https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop")', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'sepia(0.3) opacity(0.3) brightness(1.2) contrast(0.9)' }}>
+        <div className="home-wrapper" style={{ position: 'relative', minHeight: '100vh' }}>
+            {/* ── GLOBAL BOOKSHELF BACKGROUND ──────────────────── */}
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, pointerEvents: 'none' }}>
+                <div className="lb-hero-bg hero-gradient-bg" style={{ position: 'absolute', inset: 0, opacity: 0.95, mixBlendMode: 'normal', backgroundImage: 'url("https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop")', backgroundSize: 'cover', backgroundPosition: 'center', filter: 'sepia(0.3) opacity(0.3) brightness(1.2) contrast(0.9)' }}>
                     {heroBook?.coverUrl && (
-                        <img src={heroBook.coverUrl} alt="" className="lb-hero-bg-img" aria-hidden style={{ opacity: 0.3 }} />
+                        <img src={heroBook.coverUrl} alt="" className="lb-hero-bg-img" aria-hidden style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.3 }} />
                     )}
-                    <div className="lb-hero-overlay" />
+                    <div className="lb-hero-overlay" style={{ position: 'absolute', inset: 0 }} />
                 </div>
-                <div className="hero-noise-overlay"></div>
-                <div className="hero-radial-glow"></div>
+                <div className="hero-noise-overlay" style={{ position: 'absolute', inset: 0 }}></div>
+                <div className="hero-radial-glow" style={{ position: 'absolute', inset: 0 }}></div>
+            </div>
+
+            {/* ── FULL-BLEED HERO ───────────────────────────────── */}
+            <section className="lb-hero" style={{ position: 'relative', overflow: 'hidden', backgroundColor: 'transparent' }}>
                 <div className="lb-hero-content" style={{ position: 'relative', zIndex: 10 }}>
                     {!isAuthenticated ? (
                         <>
