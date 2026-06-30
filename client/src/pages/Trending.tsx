@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { fetchTrendingBooks, getStarterBooks, type Book } from '@/lib/api';
+import { fetchTrendingBooks, type Book } from '@/lib/api';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { Filter, TrendingUp } from 'lucide-react';
 import '@/styles/pages.css';
@@ -19,14 +19,10 @@ const GENRES = [
 type FilterOption = 'all' | string;
 
 export function Trending() {
-    const [genreBooks, setGenreBooks] = useState<Record<string, Book[]>>(() => {
-        const initial: Record<string, Book[]> = {};
-        GENRES.forEach(g => {
-            initial[g.genre] = getStarterBooks(g.genre);
-        });
-        return initial;
-    });
+    const [genreBooks, setGenreBooks] = useState<Record<string, Book[]>>({});
     const [genreLoading, setGenreLoading] = useState<Record<string, boolean>>({});
+    const [genreTotalItems, setGenreTotalItems] = useState<Record<string, number>>({});
+    const [genreLoadingMore, setGenreLoadingMore] = useState<Record<string, boolean>>({});
     const [activeFilter, setActiveFilter] = useState<FilterOption>('all');
 
     useEffect(() => {
@@ -40,14 +36,30 @@ export function Trending() {
 
         GENRES.forEach(async ({ genre, query }) => {
             try {
-                const books = await fetchTrendingBooks(query, 15);
+                const { books, totalItems } = await fetchTrendingBooks(query, 40, 0);
                 if (books && books.length > 0) {
                     setGenreBooks(prev => ({ ...prev, [genre]: books }));
+                    setGenreTotalItems(prev => ({ ...prev, [genre]: totalItems }));
                 }
             } catch { /* ignore */ }
             setGenreLoading(prev => ({ ...prev, [genre]: false }));
         });
     }, []);
+
+    const loadMore = async (genre: string) => {
+        const config = GENRES.find(g => g.genre === genre);
+        if (!config) return;
+        setGenreLoadingMore(prev => ({ ...prev, [genre]: true }));
+        try {
+            const currentCount = genreBooks[genre]?.length || 0;
+            const { books, totalItems } = await fetchTrendingBooks(config.query, 40, currentCount);
+            if (books && books.length > 0) {
+                setGenreBooks(prev => ({ ...prev, [genre]: [...(prev[genre] || []), ...books] }));
+                setGenreTotalItems(prev => ({ ...prev, [genre]: totalItems }));
+            }
+        } catch { /* ignore */ }
+        setGenreLoadingMore(prev => ({ ...prev, [genre]: false }));
+    };
 
 
     const visibleGenres = activeFilter === 'all'
@@ -98,6 +110,9 @@ export function Trending() {
                         emoji={emoji}
                         books={genreBooks[genre] || []}
                         loading={genreLoading[genre]}
+                        hasMore={!genreLoadingMore[genre] && (genreTotalItems[genre] || 0) > (genreBooks[genre]?.length || 0)}
+                        onLoadMore={() => loadMore(genre)}
+                        loadingMore={genreLoadingMore[genre]}
                     />
                 ))}
             </div>

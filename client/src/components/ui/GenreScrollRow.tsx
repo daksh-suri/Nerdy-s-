@@ -9,9 +9,12 @@ interface GenreScrollRowProps {
     books: Book[];
     loading?: boolean;
     emoji?: string;
+    hasMore?: boolean;
+    onLoadMore?: () => void;
+    loadingMore?: boolean;
 }
 
-export function GenreScrollRow({ genre, books, loading, emoji = '📚' }: GenreScrollRowProps) {
+export function GenreScrollRow({ genre, books, loading, emoji = '📚', hasMore, onLoadMore, loadingMore }: GenreScrollRowProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scroll = (dir: 'left' | 'right') => {
@@ -56,6 +59,17 @@ export function GenreScrollRow({ genre, books, loading, emoji = '📚' }: GenreS
                             <BookCard book={book} />
                         </div>
                     ))}
+                </div>
+            )}
+            {hasMore && !loading && (
+                <div className="genre-row-footer">
+                    <button
+                        className="genre-load-more"
+                        onClick={onLoadMore}
+                        disabled={loadingMore}
+                    >
+                        {loadingMore ? 'Loading...' : 'Show more →'}
+                    </button>
                 </div>
             )}
         </div>

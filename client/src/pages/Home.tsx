@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Heart, Star, Eye, TrendingUp, Users, Zap } from 'lucide-react';
 import CountUp from 'react-countup';
-import { searchBooks, getBookDetails, getStarterBooks, type Book } from '@/lib/api';
+import { searchBooks, getBookDetails, type Book } from '@/lib/api';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { getFavorites, getAllLogs, getUserLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
@@ -53,14 +53,10 @@ export function Home() {
     const { user, isAuthenticated } = useAuth();
     const [heroBook, setHeroBook] = useState<Book | null>(null);
     const [showcaseBooks, setShowcaseBooks] = useState<Book[]>([]);
-    const [genreData, setGenreData] = useState<Record<string, Book[]>>(() => {
-        const initial: Record<string, Book[]> = {};
-        GENRE_CONFIG.forEach(g => {
-            initial[g.genre] = getStarterBooks(g.genre);
-        });
-        return initial;
-    });
+    const [genreData, setGenreData] = useState<Record<string, Book[]>>({});
     const [genreLoading, setGenreLoading] = useState<Record<string, boolean>>({});
+    const [genreTotalItems, setGenreTotalItems] = useState<Record<string, number>>({});
+    const [genreLoadingMore, setGenreLoadingMore] = useState<Record<string, boolean>>({});
     const [recentBooks, setRecentBooks] = useState<Book[]>([]);
     const [heroLoading, setHeroLoading] = useState(true);
     const [activeReview, setActiveReview] = useState(0);
@@ -68,6 +64,21 @@ export function Home() {
 
     const [booksRead, setBooksRead] = useState(0);
     const [favsCount, setFavsCount] = useState(0);
+
+    const loadMore = async (genre: string) => {
+        const config = GENRE_CONFIG.find(g => g.genre === genre);
+        if (!config) return;
+        setGenreLoadingMore(prev => ({ ...prev, [genre]: true }));
+        try {
+            const currentCount = genreData[genre]?.length || 0;
+            const { books, totalItems } = await searchBooks(config.query, currentCount);
+            if (books && books.length > 0) {
+                setGenreData(prev => ({ ...prev, [genre]: [...(prev[genre] || []), ...books] }));
+                setGenreTotalItems(prev => ({ ...prev, [genre]: totalItems }));
+            }
+        } catch { /* ignore */ }
+        setGenreLoadingMore(prev => ({ ...prev, [genre]: false }));
+    };
 
     // Load real user reviews from API, fall back to samples
     useEffect(() => {
@@ -109,8 +120,8 @@ export function Home() {
                     searchBooks('bestselling fiction 2024'),
                     searchBooks('subject:classic literature popular'),
                 ]);
-                setHeroBook(getDailyBook(bestsellers));
-                setShowcaseBooks([...bestsellers, ...classics].slice(0, 10));
+                setHeroBook(getDailyBook(bestsellers.books));
+                setShowcaseBooks([...bestsellers.books, ...classics.books].slice(0, 10));
             } catch { /* ignore */ }
             setHeroLoading(false);
         })();
@@ -140,9 +151,10 @@ export function Home() {
 
         GENRE_CONFIG.forEach(async ({ genre, query }) => {
             try {
-                const books = await searchBooks(query);
+                const { books, totalItems } = await searchBooks(query, 0);
                 if (books && books.length > 0) {
-                    setGenreData(prev => ({ ...prev, [genre]: books.slice(0, 15) }));
+                    setGenreData(prev => ({ ...prev, [genre]: books }));
+                    setGenreTotalItems(prev => ({ ...prev, [genre]: totalItems }));
                 }
             } catch { /* ignore */ }
             setGenreLoading(prev => ({ ...prev, [genre]: false }));
@@ -381,6 +393,9 @@ export function Home() {
                         emoji={emoji}
                         books={genreData[genre] || []}
                         loading={genreLoading[genre]}
+                        hasMore={!genreLoadingMore[genre] && (genreTotalItems[genre] || 0) > (genreData[genre]?.length || 0)}
+                        onLoadMore={() => loadMore(genre)}
+                        loadingMore={genreLoadingMore[genre]}
                     />
                 ))}
             </div>
