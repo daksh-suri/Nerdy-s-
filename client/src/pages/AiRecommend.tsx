@@ -136,7 +136,7 @@ export function AiRecommend() {
         setError('');
         setRecommendations([]);
         try {
-            const results = await searchBooks(mood);
+            const { books: results } = await searchBooks(mood, 0, 10);
             if (results.length === 0) {
                 setError('No books found for this mood. Try a different selection!');
             } else {

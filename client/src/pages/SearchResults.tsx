@@ -23,13 +23,11 @@ export function SearchResults() {
             setBooks([]);
             setRelated([]);
             try {
-                const results = await searchBooks(query);
+                const { books: results } = await searchBooks(query, 0, 20);
                 if (results.length === 0) {
                     setError('No books found matching your search.');
                 } else {
-                    // First result is the "best match" hero
                     setBooks(results.slice(0, 1));
-                    // The rest are "related"
                     setRelated(results.slice(1));
                 }
             } catch {

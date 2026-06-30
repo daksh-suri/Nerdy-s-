@@ -1,6 +1,8 @@
 
 import express from 'express';
-import * as bookProvider from '../services/bookProvider.js';
+import { BookService } from '../services/BookService.js';
+import { toApiFormat } from '../utils/normalizeBook.js';
+const bookProvider = new BookService();
 
 const router = express.Router();
 
@@ -46,21 +48,8 @@ router.post('/recommend', async (req, res) => {
     const query = MOOD_TO_QUERY[mood] || mood || 'bestseller fiction';
     const timeLimit = (TIME_TO_PAGES[time] && parseInt(TIME_TO_PAGES[time].match(/\d+/)?.[0] || '8')) || 8;
     try {
-        const result = await bookProvider.search(query, 0, timeLimit * 2);
-        const books = result.books
-            .filter(b => b.thumbnail)
-            .slice(0, timeLimit)
-            .map(b => ({
-                id: b.id,
-                title: b.title,
-                author: b.authors.join(', '),
-                coverUrl: b.thumbnail,
-                rating: b.averageRating || 0,
-                description: b.description || '',
-                publishedDate: b.publishedDate,
-                pages: b.pageCount || 0,
-                genre: b.categories,
-            }));
+        const result = await bookProvider.search(query, timeLimit * 2, 0);
+        const books = result.books.slice(0, timeLimit).map(toApiFormat);
         res.json(books);
     } catch (error) {
         console.error('AI recommend error:', error);

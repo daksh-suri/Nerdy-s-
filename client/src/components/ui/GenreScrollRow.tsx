@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { memo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { type Book } from '@/lib/api';
 import { BookCard } from '@/components/ui/BookCard';
@@ -9,12 +9,9 @@ interface GenreScrollRowProps {
     books: Book[];
     loading?: boolean;
     emoji?: string;
-    hasMore?: boolean;
-    onLoadMore?: () => void;
-    loadingMore?: boolean;
 }
 
-export function GenreScrollRow({ genre, books, loading, emoji = '📚', hasMore, onLoadMore, loadingMore }: GenreScrollRowProps) {
+export const GenreScrollRow = memo(function GenreScrollRow({ genre, books, loading, emoji = '📚' }: GenreScrollRowProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const scroll = (dir: 'left' | 'right') => {
@@ -61,17 +58,6 @@ export function GenreScrollRow({ genre, books, loading, emoji = '📚', hasMore,
                     ))}
                 </div>
             )}
-            {hasMore && !loading && (
-                <div className="genre-row-footer">
-                    <button
-                        className="genre-load-more"
-                        onClick={onLoadMore}
-                        disabled={loadingMore}
-                    >
-                        {loadingMore ? 'Loading...' : 'Show more →'}
-                    </button>
-                </div>
-            )}
         </div>
     );
-}
+});
