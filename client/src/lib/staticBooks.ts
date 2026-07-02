@@ -1,6 +1,18 @@
 import { type Book } from './api';
 
-const getGoogleCover = (id: string) => `https://books.google.com/books/content?id=${id}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
+const UNSPLASH_BOOK_COVERS = [
+    'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=200&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=200&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1506466010722-395aa2bef877?q=80&w=200&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=200&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1490633874781-1c63cc424610?q=80&w=200&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=200&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=200&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=200&auto=format&fit=crop',
+];
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getGoogleCover = (_id: string) => UNSPLASH_BOOK_COVERS[Math.floor(Math.random() * UNSPLASH_BOOK_COVERS.length)];
 
 export const STARTER_BOOKS: Record<string, Book[]> = {
     'Fiction': [

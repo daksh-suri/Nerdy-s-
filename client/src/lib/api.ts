@@ -44,9 +44,9 @@ export const api = {
 // Retries on network / timeout errors so the Trending + Home pages auto-recover
 // once Render finishes its cold start.
 
-const FETCH_TIMEOUT_MS = 10000;
+const FETCH_TIMEOUT_MS = 5000;
 
-async function fetchWithRetry(url: string, retries = 1, backoffMs = 2000): Promise<Response> {
+async function fetchWithRetry(url: string, retries = 1, backoffMs = 1500): Promise<Response> {
     for (let i = 0; i <= retries; i++) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -76,23 +76,35 @@ async function fetchWithRetry(url: string, retries = 1, backoffMs = 2000): Promi
 
 export async function searchBooks(query: string, startIndex = 0, maxResults = 20): Promise<{ books: Book[]; totalItems: number }> {
     if (!query) return { books: [], totalItems: 0 };
+    const url = `${BASE_URL}/api/books/search?q=${encodeURIComponent(query)}&maxResults=${maxResults}&startIndex=${startIndex}`;
     try {
-        const res = await fetchWithRetry(`${BASE_URL}/api/books/search?q=${encodeURIComponent(query)}&maxResults=${maxResults}&startIndex=${startIndex}`);
-        if (!res.ok) return { books: [], totalItems: 0 };
-        return await res.json();
+        const res = await fetchWithRetry(url);
+        if (!res.ok) {
+            console.warn(`[api] searchBooks 404/error for "${query}"`, res.status);
+            return { books: [], totalItems: 0 };
+        }
+        const data = await res.json();
+        console.log(`[api] searchBooks "${query}" → ${data.books?.length ?? 0} results`);
+        return data;
     } catch (error) {
-        console.error('Error searching books:', error);
+        console.error(`[api] searchBooks "${query}" failed — server unreachable?`, error);
         return { books: [], totalItems: 0 };
     }
 }
 
 export async function fetchTrendingBooks(query = 'bestselling fiction', maxResults = 20, startIndex = 0): Promise<{ books: Book[]; totalItems: number }> {
+    const url = `${BASE_URL}/api/books/trending?query=${encodeURIComponent(query)}&maxResults=${maxResults}&startIndex=${startIndex}`;
     try {
-        const res = await fetchWithRetry(`${BASE_URL}/api/books/trending?query=${encodeURIComponent(query)}&maxResults=${maxResults}&startIndex=${startIndex}`);
-        if (!res.ok) return { books: [], totalItems: 0 };
-        return await res.json();
+        const res = await fetchWithRetry(url);
+        if (!res.ok) {
+            console.warn(`[api] fetchTrendingBooks 404/error for "${query}"`, res.status);
+            return { books: [], totalItems: 0 };
+        }
+        const data = await res.json();
+        console.log(`[api] fetchTrendingBooks "${query}" → ${data.books?.length ?? 0} results`);
+        return data;
     } catch (e) {
-        console.error(e);
+        console.error(`[api] fetchTrendingBooks "${query}" failed — server unreachable?`, e);
         return { books: [], totalItems: 0 };
     }
 }
@@ -100,10 +112,13 @@ export async function fetchTrendingBooks(query = 'bestselling fiction', maxResul
 export async function getBookDetails(id: string): Promise<Book | null> {
     try {
         const res = await fetchWithRetry(`${BASE_URL}/api/books/${id}`);
-        if (!res.ok) return null;
+        if (!res.ok) {
+            console.warn(`[api] getBookDetails 404 for "${id}"`, res.status);
+            return null;
+        }
         return await res.json();
     } catch (error) {
-        console.error('Error fetching book details:', error);
+        console.error(`[api] getBookDetails "${id}" failed — server unreachable?`, error);
         return null;
     }
 }
