@@ -3,6 +3,8 @@ import { normalizeOpenLibraryBook, normalizeOpenLibraryBookDetail } from '../uti
 const SEARCH_URL = 'https://openlibrary.org/search.json';
 const WORKS_URL = 'https://openlibrary.org/works';
 
+const FETCH_TIMEOUT_MS = 10000;
+
 export class OpenLibraryProvider {
     constructor() {
         this.name = 'openlibrary';
@@ -11,7 +13,7 @@ export class OpenLibraryProvider {
     async search(query, maxResults = 20, startIndex = 0) {
         try {
             const url = `${SEARCH_URL}?q=${encodeURIComponent(query)}&limit=${maxResults}&offset=${startIndex}`;
-            const response = await fetch(url);
+            const response = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
 
             if (!response.ok) {
                 console.warn(`Open Library API error ${response.status} for "${query}"`);
@@ -30,7 +32,7 @@ export class OpenLibraryProvider {
 
     async getById(id) {
         try {
-            const response = await fetch(`${WORKS_URL}/${id}.json`);
+            const response = await fetch(`${WORKS_URL}/${id}.json`, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
             if (!response.ok) return null;
 
             const data = await response.json();

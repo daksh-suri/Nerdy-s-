@@ -4,20 +4,11 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Heart, Star, Eye, TrendingUp, Users, Zap } from 'lucide-react';
 import CountUp from 'react-countup';
 import { searchBooks, getBookDetails, type Book } from '@/lib/api';
-import { STARTER_BOOKS } from '@/lib/staticBooks';
+import { GENRE_CONFIG } from '@/lib/genreConfig';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { getFavorites, getAllLogs, getUserLogs } from '@/lib/storage';
 import { useAuth } from '@/lib/AuthContext';
 import '@/styles/pages.css';
-
-const GENRE_CONFIG = [
-    { genre: 'Fiction', emoji: '✨', query: 'subject:fiction bestselling' },
-    { genre: 'Mystery & Thriller', emoji: '🕵️', query: 'subject:mystery' },
-    { genre: 'Science Fiction', emoji: '🚀', query: 'subject:science fiction' },
-    { genre: 'Fantasy', emoji: '🧙', query: 'subject:fantasy popular' },
-    { genre: 'Romance', emoji: '💕', query: 'subject:romance' },
-    { genre: 'History', emoji: '📜', query: 'subject:history nonfiction' },
-];
 
 const FEATURE_CARDS = [
     { icon: Eye, title: 'Track every book', desc: 'Keep a diary of every book you read, starting from whenever you join.', color: '#7c3aed' },
@@ -54,7 +45,7 @@ export function Home() {
     const { user, isAuthenticated } = useAuth();
     const [heroBook, setHeroBook] = useState<Book | null>(null);
     const [showcaseBooks, setShowcaseBooks] = useState<Book[]>([]);
-    const [genreData, setGenreData] = useState<Record<string, Book[]>>(STARTER_BOOKS);
+    const [genreData, setGenreData] = useState<Record<string, Book[]>>({});
     const [genreLoading, setGenreLoading] = useState<Record<string, boolean>>({});
     const [recentBooks, setRecentBooks] = useState<Book[]>([]);
     const [heroLoading, setHeroLoading] = useState(true);

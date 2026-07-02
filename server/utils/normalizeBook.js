@@ -1,9 +1,7 @@
-const COVER_FALLBACK = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=1000&auto=format&fit=crop';
-
 function resolveCover(coverId, isbn) {
     if (coverId) return `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`;
     if (isbn) return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
-    return COVER_FALLBACK;
+    return '';
 }
 
 export function normalizeOpenLibraryBook(doc) {
@@ -32,7 +30,7 @@ export function normalizeGoogleBook(item) {
     const isbn = v.industryIdentifiers?.find(i => i.type === 'ISBN_13' || i.type === 'ISBN_10')?.identifier || null;
 
     const gbCover = v.imageLinks?.thumbnail?.replace('http:', 'https:');
-    const coverImage = gbCover || (isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : COVER_FALLBACK);
+    const coverImage = gbCover || (isbn ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg` : '');
 
     return {
         title: v.title || 'Unknown Title',
@@ -57,7 +55,7 @@ export async function normalizeOpenLibraryBookDetail(data) {
         const authorKey = data.authors[0].author?.key;
         if (authorKey) {
             try {
-                const authorRes = await fetch(`https://openlibrary.org${authorKey}.json`);
+                const authorRes = await fetch(`https://openlibrary.org${authorKey}.json`, { signal: AbortSignal.timeout(5000) });
                 if (authorRes.ok) {
                     const authorData = await authorRes.json();
                     author = authorData.name || 'Unknown Author';

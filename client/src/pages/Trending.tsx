@@ -1,34 +1,23 @@
 
 import { useEffect, useState } from 'react';
-import { fetchTrendingBooks, type Book } from '@/lib/api';
-import { STARTER_BOOKS } from '@/lib/staticBooks';
+import { searchBooks, type Book } from '@/lib/api';
+import { GENRE_CONFIG } from '@/lib/genreConfig';
 import { GenreScrollRow } from '@/components/ui/GenreScrollRow';
 import { Filter, TrendingUp } from 'lucide-react';
 import '@/styles/pages.css';
 
-const GENRES = [
-    { genre: 'Fiction', emoji: '✨', query: 'subject:fiction bestselling' },
-    { genre: 'Mystery & Thriller', emoji: '🕵️', query: 'subject:mystery' },
-    { genre: 'Science Fiction', emoji: '🚀', query: 'subject:science fiction' },
-    { genre: 'Fantasy', emoji: '🧙', query: 'subject:fantasy popular' },
-    { genre: 'Romance', emoji: '💕', query: 'subject:romance' },
-    { genre: 'History', emoji: '📜', query: 'subject:history nonfiction' },
-    { genre: 'Biography', emoji: '👤', query: 'subject:biography memoir' },
-    { genre: 'Self-Help', emoji: '💡', query: 'subject:self help personal development' },
-];
-
 type FilterOption = 'all' | string;
 
 export function Trending() {
-    const [genreBooks, setGenreBooks] = useState<Record<string, Book[]>>(STARTER_BOOKS);
+    const [genreBooks, setGenreBooks] = useState<Record<string, Book[]>>({});
     const [genreLoading, setGenreLoading] = useState<Record<string, boolean>>({});
     const [activeFilter, setActiveFilter] = useState<FilterOption>('all');
 
     useEffect(() => {
-        GENRES.forEach(async ({ genre, query }) => {
+        GENRE_CONFIG.forEach(async ({ genre, query }) => {
             setGenreLoading(prev => ({ ...prev, [genre]: true }));
             try {
-                const { books } = await fetchTrendingBooks(query, 20, 0);
+                const { books } = await searchBooks(query, 0, 20);
                 if (books && books.length > 0) {
                     setGenreBooks(prev => ({ ...prev, [genre]: books }));
                 }
@@ -39,8 +28,8 @@ export function Trending() {
 
 
     const visibleGenres = activeFilter === 'all'
-        ? GENRES
-        : GENRES.filter(g => g.genre === activeFilter);
+        ? GENRE_CONFIG
+        : GENRE_CONFIG.filter(g => g.genre === activeFilter);
 
     return (
         <div className="page-container-inner">
@@ -65,7 +54,7 @@ export function Trending() {
                     >
                         All Genres
                     </button>
-                    {GENRES.map(({ genre, emoji }) => (
+                    {GENRE_CONFIG.map(({ genre, emoji }) => (
                         <button
                             key={genre}
                             className={`genre-pill ${activeFilter === genre ? 'genre-pill-active' : ''}`}

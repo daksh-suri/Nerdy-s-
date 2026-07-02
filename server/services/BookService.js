@@ -2,7 +2,7 @@ import { OpenLibraryProvider } from '../providers/OpenLibraryProvider.js';
 import { GoogleBooksProvider } from '../providers/GoogleBooksProvider.js';
 import { deduplicateBooks } from '../utils/deduplicateBooks.js';
 
-const SUFFICIENT_RESULTS = 15;
+const SUFFICIENT_RESULTS = 10;
 const CACHE = new Map();
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
@@ -31,28 +31,20 @@ export class BookService {
         const cached = getCached(cacheKey);
         if (cached) return cached;
 
-        // 1. Try Open Library first
+        // Open Library is the primary source - try it first
         const olBooks = await this.openLibrary.search(query, maxResults, startIndex);
+        let merged = [...olBooks];
 
-        // 2. If enough results, return immediately
-        if (olBooks.length >= SUFFICIENT_RESULTS) {
-            const result = { books: olBooks, totalItems: olBooks.length };
-            setCache(cacheKey, result);
-            return result;
+        // Only fall back to Google Books if Open Library returned insufficient results
+        // Google Books is unreliable due to rate limiting
+        if (olBooks.length < SUFFICIENT_RESULTS) {
+            const gbBooks = await this.googleBooks.search(query, maxResults, startIndex);
+            if (gbBooks.length > 0) {
+                merged = deduplicateBooks([...olBooks, ...gbBooks]);
+            }
         }
 
-        // 3. Otherwise, supplement with Google Books
-        const remaining = maxResults - olBooks.length;
-        let gbBooks = [];
-
-        if (remaining > 0) {
-            gbBooks = await this.googleBooks.search(query, remaining, startIndex);
-        }
-
-        // 4. Merge and deduplicate
-        const merged = deduplicateBooks([...olBooks, ...gbBooks]);
         const totalItems = Math.max(olBooks.length, merged.length);
-
         const result = { books: merged, totalItems };
         setCache(cacheKey, result);
         return result;
@@ -67,18 +59,18 @@ export class BookService {
         const cached = getCached(cacheKey);
         if (cached) return cached;
 
-        // 1. Try Google Books first (richer data for single book view)
-        const gbBook = await this.googleBooks.getById(id);
-        if (gbBook) {
-            setCache(cacheKey, gbBook);
-            return gbBook;
-        }
-
-        // 2. Fall back to Open Library
+        // Open Library is the primary source - try it first
         const olBook = await this.openLibrary.getById(id);
         if (olBook) {
             setCache(cacheKey, olBook);
             return olBook;
+        }
+
+        // Fall back to Google Books
+        const gbBook = await this.googleBooks.getById(id);
+        if (gbBook) {
+            setCache(cacheKey, gbBook);
+            return gbBook;
         }
 
         return null;

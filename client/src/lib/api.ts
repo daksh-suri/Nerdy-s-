@@ -41,28 +41,31 @@ export const api = {
 };
 
 // ─── Retry helper for book API calls ──────────────────────────────────────────
-// Retries on network / timeout errors so the Trending + Home pages auto-recover
-// once Render finishes its cold start.
+// Server-side book providers (Open Library 10s timeout + Google Books 8s timeout)
+// may take up to 18s per request. The timeout must be generous enough to let the
+// server finish its external API calls before the client gives up.
 
-const FETCH_TIMEOUT_MS = 5000;
+const FETCH_TIMEOUT_MS = 25000;
+const MAX_RETRIES = 2;
+const BASE_BACKOFF_MS = 1500;
 
-async function fetchWithRetry(url: string, retries = 1, backoffMs = 1500): Promise<Response> {
-    for (let i = 0; i <= retries; i++) {
+async function fetchWithRetry(url: string): Promise<Response> {
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
         try {
             const res = await fetch(url, { signal: controller.signal });
             clearTimeout(timeoutId);
             if (res.ok) return res;
-            if (res.status >= 500 && i < retries) {
-                await new Promise(r => setTimeout(r, backoffMs * (i + 1)));
+            if (res.status >= 500 && attempt < MAX_RETRIES) {
+                await new Promise(r => setTimeout(r, BASE_BACKOFF_MS * (attempt + 1)));
                 continue;
             }
             return res;
         } catch (err) {
             clearTimeout(timeoutId);
-            if (i < retries) {
-                await new Promise(r => setTimeout(r, backoffMs * (i + 1)));
+            if (attempt < MAX_RETRIES) {
+                await new Promise(r => setTimeout(r, BASE_BACKOFF_MS * (attempt + 1)));
                 continue;
             }
             throw err;
@@ -92,22 +95,7 @@ export async function searchBooks(query: string, startIndex = 0, maxResults = 20
     }
 }
 
-export async function fetchTrendingBooks(query = 'bestselling fiction', maxResults = 20, startIndex = 0): Promise<{ books: Book[]; totalItems: number }> {
-    const url = `${BASE_URL}/api/books/trending?query=${encodeURIComponent(query)}&maxResults=${maxResults}&startIndex=${startIndex}`;
-    try {
-        const res = await fetchWithRetry(url);
-        if (!res.ok) {
-            console.warn(`[api] fetchTrendingBooks 404/error for "${query}"`, res.status);
-            return { books: [], totalItems: 0 };
-        }
-        const data = await res.json();
-        console.log(`[api] fetchTrendingBooks "${query}" → ${data.books?.length ?? 0} results`);
-        return data;
-    } catch (e) {
-        console.error(`[api] fetchTrendingBooks "${query}" failed — server unreachable?`, e);
-        return { books: [], totalItems: 0 };
-    }
-}
+
 
 export async function getBookDetails(id: string): Promise<Book | null> {
     try {
@@ -123,5 +111,3 @@ export async function getBookDetails(id: string): Promise<Book | null> {
     }
 }
 
-// Alias for legacy calls
-export const fetchBookDetails = getBookDetails;
